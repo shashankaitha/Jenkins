@@ -64,6 +64,8 @@ Jenkins Pre-Req:
 
     https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
+    Post Installation, Create IAM role with Admin level policies and attach it to current ec2 instance
+
 ## _10. Install TrivyScanner:_
 
     wget https://github.com/aquasecurity/trivy/releases/download/v0.41.0/trivy_0.41.0_Linux-64bit.tar.gz
@@ -77,6 +79,10 @@ Take an Image from the instances and use it for slave groups.
 ## _11. Install Jenkins Version 2.401.2:_
 
 Artical: https://directdevops.blog/2019/01/04/installing-specific-lts-version-of-jenkins-on-ubuntu/
+
+    wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+    echo deb https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list
+    sudo apt-get update
 
     curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
     /usr/share/keyrings/jenkins-keyring.asc > /dev/null
@@ -101,10 +107,24 @@ Artical: https://directdevops.blog/2019/01/04/installing-specific-lts-version-of
 ## _12.Install Plugins in Jenkins:_
 
 1. AWS steps
-2. DockerVersion 1.5
+2. Docker 1.5
 3. SonarQube Scanner
 4. Blue Ocean
 5. MultiBranch  Scan Webhook Trigger
 6. Slack Notification
 7. Ansible
+
+## _13.Agent Installation:_
+
+1. Spinup the Agents using the AMI(master node)
+2. Login into Jenkins Server
+3. Go to Below path and add the credentials
+ Dashboard >Manage Jenkins >Credentials >System>Globalcredentials (unrestricted) > Add Credentials
+4. Kind (Username with Password) --> Add Username (ubuntu) -->   Add Private key(Copy and paste ec2 pem key) --> Save
+5. Add Node
+    Dashboard>Manage Jenkins> Add Node > Node name > Permanent Agent> Number of Exec(2)> Remote Dir (/home/ubuntu)>Labels(DEV)>Usage(Only Build Jobs with label expressions matching this node)> Lauchmethod (Lauch Agent with ssh) > Host (Enter Private IP Address) > Credentials(ubuntu) > Host Key Verification Strategy (Non Verifying Verification Strategy)
+
+    NodeProperties > List of Variables > Name (Env) > Value (Dev)
+
+    Repeat the above steps to add multiple nodes.
 
